@@ -9,22 +9,26 @@ const todos = [
  
 const server = http.createServer((req, res) => {
 
-      const {headers, url, method} = req;
+  const {headers, url, method} = req;
 
   res.setHeader("Content-Type", "application/json");
   res.setHeader("X-Powered-By", "NodeJS");
   res.setHeader("X-My-HeaderKey", "MyValue");
 
-//   res.write("<h1>Hello World</h1>");
-//   res.write("<h2> Hello Again </h2>");
+
 
  let body = [];
- 
- let status = 404;
- const response = {
-     sucess : false,
-     data : null
- };
+
+ req.on('data', chunk => {
+    body.push(chunk);
+})
+.on('end', () => {
+    body = Buffer.concat(body).toString();
+    let status = 404;
+    const response = {
+        sucess : false,
+        data : null
+    };
 
 if(method === 'GET' && url === '/todos') {
     status = 200;
@@ -32,24 +36,13 @@ if(method === 'GET' && url === '/todos') {
     response.data = todos;
 } else if(method === 'POST' && url === '/todos') {
 //    const { id, text} = JSON.parse(body);
-   temp = {
-    "id": 1,
-    "text": "To do four"
-}
-    temp = JSON.stringify(temp);
-   const { id, text } = JSON.parse(temp);
+   const { id, text } = JSON.parse(body);
     todos.push({ id, text});
     status = 201;
     response.sucess = true;
     response.data = todos;
 }
- req.on('data', chunk => {
-     body.push(chunk);
- })
- .on('end', () => {
-     body = Buffer.concat(body).toString();
-
- });
+ 
 res.writeHead(status, {
     'Content-Type': 'application/json',
     'X-Powered-By': 'Node.js'
@@ -58,6 +51,9 @@ res.writeHead(status, {
   res.end(
       JSON.stringify(response)
       );
+});
+ 
+
   });
   
 const PORT = 5000;
