@@ -8,9 +8,9 @@ const todos = [
 ]
  
 const server = http.createServer((req, res) => {
-  //    console.log(req);
+
       const {headers, url, method} = req;
-  //    console.log(headers, url, method);
+
   res.setHeader("Content-Type", "application/json");
   res.setHeader("X-Powered-By", "NodeJS");
   res.setHeader("X-My-HeaderKey", "MyValue");
@@ -32,8 +32,12 @@ if(method === 'GET' && url === '/todos') {
     response.data = todos;
 } else if(method === 'POST' && url === '/todos') {
 //    const { id, text} = JSON.parse(body);
-   
-   const { id, text } = JSON.parse(body);
+   temp = {
+    "id": 1,
+    "text": "To do four"
+}
+    temp = JSON.stringify(temp);
+   const { id, text } = JSON.parse(temp);
     todos.push({ id, text});
     status = 201;
     response.sucess = true;
@@ -44,7 +48,7 @@ if(method === 'GET' && url === '/todos') {
  })
  .on('end', () => {
      body = Buffer.concat(body).toString();
-     console.log(body)
+
  });
 res.writeHead(status, {
     'Content-Type': 'application/json',
